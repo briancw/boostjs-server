@@ -1,8 +1,8 @@
 # BOOST JS 🚀 #
 ```
-npm install node-boost-beta
+npm install boostjs-server
 
-const boost = require('node-boost-beta');
+const boost = require('boostjs-server');
 const port = 3000;
 const app = boost.app;
 app.get('/', function(req, res) {
