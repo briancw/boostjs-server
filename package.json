@@ -1,0 +1,23 @@
+{
+  "name": "boostjs-server",
+  "version": "0.0.1",
+  "description": "Boost Serverside in NodeJS",
+  "main": "node-boost.js",
+  "author": "Brian Whicheloe",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/briancw/boostjs-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/briancw/boostjs-server/issues"
+  },
+  "homepage": "https://github.com/briancw/boostjs-server#readme",
+  "dependencies": {
+    "body-parser": "^1",
+    "express": "^4",
+    "object-hash": "^1",
+    "spdy": "^3.4",
+    "socket.io": "^1.4"
+  }
+}
