@@ -4,33 +4,45 @@ const app = express();
 const hash = require('object-hash');
 const spdy = require('spdy');
 
-const server_opts = {
-    spdy: {
-        protocols: ['http/1.1'],
-        plain: true,
-    },
-    // key: fs.readFileSync('./server.key'),
-    // cert: fs.readFileSync('./server.crt'),
-};
-
-const server = spdy.createServer(server_opts, app);
-const io = require('socket.io')(server);
+// const server_opts = {
+//     spdy: {
+//         protocols: ['http/1.1'],
+//         plain: true,
+//     },
+//     // key: fs.readFileSync('./server.key'),
+//     // cert: fs.readFileSync('./server.crt'),
+// };
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-// app.use(require('connect-history-api-fallback')());
+app.use(require('connect-history-api-fallback')());
 
-module.exports = {
-    app: app,
-    io: io,
+class BoostServer {
+    constructor(server_opts) {
+        this.server = spdy.createServer(server_opts, app);
+        this.io = require('socket.io')(this.server);
+
+        this.app = app;
+        this.io = this.io;
+
+        this.helpers = {
+            handle: function(err) {
+                if (err) {
+                    throw err;
+                }
+            },
+        };
+    }
+
     launch(port) {
-        server.listen(port, err => {
+        this.server.listen(port, err => {
             this.helpers.handle(err);
             console.log('Listening on port: ' + port);
         });
-    },
+    }
+
     publish(path, model, query = {}) {
-        const channel = io.of(path);
+        const channel = this.io.of(path);
 
         channel.on('connection', function(socket) {
             console.log('new connection to ' + path);
@@ -81,12 +93,7 @@ module.exports = {
         }).error(function(error) {
             console.log(error);
         });
-    },
-    helpers: {
-        handle: function(err) {
-            if (err) {
-                throw err;
-            }
-        },
-    },
-};
+    }
+}
+
+module.exports = BoostServer;

@@ -7,7 +7,13 @@ BoostJS currently only supports RethinkDB.
 ```
 npm install boostjs-server
 
-const boost = require('boostjs-server');
+const BoostServer = require('boostjs-server');
+const boost = new BoostServer({
+    spdy: {
+        protocols: ['http/1.1'],
+        plain: true,
+    },
+});
 const port = 3000;
 const app = boost.app;
 app.get('/', function(req, res) {
