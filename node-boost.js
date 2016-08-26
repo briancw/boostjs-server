@@ -10,6 +10,7 @@ const boostAuth = require('./auth/auth');
 app.use(helmet());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+app.use(boostAuth.auth);
 app.use(require('connect-history-api-fallback')());
 
 class BoostServer {
