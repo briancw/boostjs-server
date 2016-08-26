@@ -1,46 +1,41 @@
 const Adapter = require('../adapter');
 
-class DB extends Adapter
-{
-  constructor(config)
-  {
-    super(config);
-    this.dbName = config.db;
-    this.table = config.table;
-    this.actions = config.actions;
-    this.db = this.db();
-  }
-
-  init()
-  {
-    if (this.actions) {
-      this.initActions();
+class DB extends Adapter {
+    constructor(config) {
+        super(config);
+        this.dbName = config.db;
+        this.table = config.table;
+        this.actions = config.actions;
+        this.db = this.db();
     }
-  }
 
-  initActions()
-  {
-    for (let prop in this.actions) {
-      let action = this.actions[prop];
-      this.initAction(prop, action);
+    init() {
+        if (this.actions) {
+            this.initActions();
+        }
     }
-  }
 
-  initAction(prop, action)
-  {
-    let key = this.name + '.' + prop;
+    initActions() {
+        this.actions.forEach(prop => {
+            let action = this.actions[prop];
+            this.initAction(prop, action);
+        });
+    }
 
-    this.socket.on(key, (props, cb) => {
-      action = action.bind(this);
+    initAction(prop, action) {
+        let key = this.name + '.' + prop;
 
-      new Promise((resolve, reject) => {
-        return action(resolve, ...props);
-      }).then(data => {
-        console.log(data);
-        cb(data);
-      });
-    });
-  }
+        this.socket.on(key, (props, cb) => {
+            action = action.bind(this);
+
+            new Promise((resolve, reject) => {
+                return action(resolve, ...props);
+            }).then(data => {
+                console.log(data);
+                cb(data);
+            });
+        });
+    }
 }
 
 module.exports = DB;

@@ -1,20 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const hash = require('object-hash');
+const helmet = require('helmet');
 const spdy = require('spdy');
 const Redis = require('redis');
 const BoostAdapter = require('./store/adapters/boost');
+const boostAuth = require('./auth/auth');
 
-// const server_opts = {
-//     spdy: {
-//         protocols: ['http/1.1'],
-//         plain: true,
-//     },
-//     // key: fs.readFileSync('./server.key'),
-//     // cert: fs.readFileSync('./server.crt'),
-// };
-
+app.use(helmet());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(require('connect-history-api-fallback')());
@@ -48,9 +41,9 @@ class BoostServer {
 
     publish(path, model, query = {}) {
         return new BoostAdapter({
-          name: path,
-          model: model,
-          query: query
+            name: path,
+            model: model,
+            query: query,
         }).start(this);
     }
 }
