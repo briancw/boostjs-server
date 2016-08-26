@@ -1,8 +1,11 @@
-## BoostJS 🚀 serverside by [Clever.ly](http://clever.ly) ##
+## BoostJS 🚀 serverside by [Clever.ly](http://clever.ly)
 
 BoostJS is an opinionated framework designed to make responsive data easy and efficient.
 This is a nodejs serverside implementation which provides efficient data publishing over websockets.
 BoostJS currently only supports RethinkDB.
+
+Implementing Boost is currently not easy. Following this sample project is probably the easiest way to get started.
+https://github.com/briancw/boost-sample-project
 
 ```
 npm install boostjs-server
@@ -24,15 +27,16 @@ boost.launch(port, err => {
 });
 ```
 
-## Notable Npm Modules ##
-### Core: ###
+## Notable Npm Modules
+### Core:
   * thinky: RethinkDB ORM
   * socket.io: socket connections between server and client with multiplexing, fallbacks, auto-reconnect, and other useful features
 
-## Project Requirements ##
+## Project Requirements
 This project requires Rethinkdb to be installed on your machine
   https://www.rethinkdb.com/docs/install/
 
 Additionally, you will need node and npm. Current recommend version is 6.x
 
-[Development Guide!](development.md)
+[Development Guide](development.md)
+[Project Todos](todos.md)
