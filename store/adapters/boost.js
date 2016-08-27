@@ -4,6 +4,7 @@ class Boost extends DB {
     constructor(config) {
         super(config);
         this.model = config.model;
+        this.resolveQuery();
     }
 
     db() {
@@ -11,7 +12,7 @@ class Boost extends DB {
     }
 
     data() {
-        return this.model.filter(this.query).run();
+        return this.data;
     }
 
     watch() {
@@ -23,24 +24,31 @@ class Boost extends DB {
 
                 this.incoming();
 
-                // let change_type;
-                // if (doc.isSaved() === false) {
-                //     // console.log('document deleted');
-                //     change_type = 'delete';
-                // } else if (doc.getOldValue() === null) {
-                //     // console.log('new document');
-                //     change_type = 'insert';
-                // } else {
-                //     // console.log('document update');
-                //     change_type = 'update';
-                // }
-                //
-                // // console.log(change_type);
-                // this.socket.emit('update', change_type, doc);
             });
         }).error(function(error) {
             console.log(error);
         });
+    }
+
+    resolveQuery() {
+        let ret;
+        let query = this.query;
+
+        if (typeof query == 'function') {
+            query =  query.bind(this);
+            ret = query();
+
+            if (typeof ret.then == 'function') {
+                ret = query;
+            } else {
+                ret = ret.run();
+            }
+
+        } else {
+            ret = this.model.filter(this.query).run();
+        }
+
+        this.data = ret;
     }
 }
 
