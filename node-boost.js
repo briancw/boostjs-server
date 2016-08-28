@@ -4,7 +4,7 @@ const app = express();
 const helmet = require('helmet');
 const spdy = require('spdy');
 const Redis = require('redis');
-const BoostAdapter = require('./store/adapters/boost');
+const BoostRethink = require('./store/adapters/boost-rethink');
 const boostAuth = require('./auth/auth');
 
 app.use(helmet());
@@ -41,7 +41,7 @@ class BoostServer {
     }
 
     publish(path, model, query = {}) {
-        return new BoostAdapter({
+        return new BoostRethink({
             name: path,
             model: model,
             query: query,

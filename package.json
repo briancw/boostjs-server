@@ -1,6 +1,6 @@
 {
   "name": "boostjs-server",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Boost Serverside in NodeJS",
   "main": "node-boost.js",
   "author": "Brian Whicheloe",
