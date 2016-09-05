@@ -3,7 +3,7 @@ const secret_key = process.env.JWT_SECRET;
 
 module.exports = {
     auth: function(req, res, next) {
-        console.log(req)
+        // console.log(req)
         if (req.body.token) {
             let token = req.body.token;
             // console.log(token);
@@ -18,7 +18,7 @@ module.exports = {
                 }
             });
         } else {
-            console.log('No token');
+            // console.log('No token');
             next();
         }
     },

@@ -3,9 +3,11 @@ const bodyParser = require('body-parser');
 const app = express();
 const helmet = require('helmet');
 const spdy = require('spdy');
-const Redis = require('redis');
 const BoostRethink = require('./store/adapters/boost-rethink');
 const boostAuth = require('./auth/auth');
+
+// Cache options
+const RedisCache = require('./cache/adapters/redis');
 
 app.use(helmet());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -16,9 +18,10 @@ app.use(require('connect-history-api-fallback')());
 class BoostServer {
     constructor(server_opts) {
         this.server = spdy.createServer(server_opts, app);
-        this.cache = Redis.createClient();
         this.app = app;
         this.io = this.io;
+        this.cache = server_opts.cache;
+        this.initCache();
 
         let io = require('socket.io').listen(this.server);
         io.set('transports', ['websocket']);
@@ -31,6 +34,14 @@ class BoostServer {
                 }
             },
         };
+    }
+
+    initCache() {
+        let cache = this.cache;
+
+        if (cache.type === 'redis') {
+            this.cache = new RedisCache(cache);
+        }
     }
 
     launch(port) {

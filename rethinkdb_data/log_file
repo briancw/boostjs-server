@@ -1,0 +1,18 @@
+2016-09-03T16:05:53.538701000 0.526266s notice: Recursively removing directory /Users/max/Sites/boostjs-server/rethinkdb_data/tmp
+2016-09-03T16:05:53.541026000 0.528598s notice: Initializing directory /Users/max/Sites/boostjs-server/rethinkdb_data
+2016-09-03T16:05:53.541197000 0.528761s info: Creating a default database for your convenience. (This is because you ran 'rethinkdb' without 'create', 'serve', or '--join', and the directory '/Users/max/Sites/boostjs-server/rethinkdb_data' did not already exist or is empty.)
+2016-09-03T16:05:53.541267000 0.528831s notice: Running rethinkdb 2.3.5 (CLANG 7.3.0 (clang-703.0.31))...
+2016-09-03T16:05:53.547166000 0.534731s notice: Running on Darwin 15.6.0 x86_64
+2016-09-03T16:05:53.547233000 0.534797s notice: Loading data from directory /Users/max/Sites/boostjs-server/rethinkdb_data
+2016-09-03T16:05:53.658944000 0.646508s info: Automatically using cache size of 1115 MB
+2016-09-03T16:05:53.659876000 0.647440s notice: Listening for intracluster connections on port 29015
+2016-09-03T16:05:53.661292000 0.648856s notice: Listening for client driver connections on port 28015
+2016-09-03T16:05:53.661480000 0.649044s notice: Listening for administrative HTTP connections on port 8080
+2016-09-03T16:05:53.661483000 0.649047s notice: Listening on cluster addresses: 127.0.0.1, ::1
+2016-09-03T16:05:53.661488000 0.649051s notice: Listening on driver addresses: 127.0.0.1, ::1
+2016-09-03T16:05:53.661489000 0.649053s notice: Listening on http addresses: 127.0.0.1, ::1
+2016-09-03T16:05:53.661504000 0.649068s notice: To fully expose RethinkDB on the network, bind to all addresses by running rethinkdb with the `--bind all` command line option.
+2016-09-03T16:05:53.661509000 0.649072s notice: Server ready, "MaxMacBookAir_sh6" c13be4c5-d90d-4090-ac6f-bd00f58514ca
+2016-09-03T16:06:20.338134000 27.323799s info: Table 01b1dc89-45f1-4629-80a8-d0e7843c4466: Starting a new Raft election for term 1.
+2016-09-03T16:06:20.338708000 27.324374s info: Table 01b1dc89-45f1-4629-80a8-d0e7843c4466: Added replica on this server.
+2016-09-03T16:06:20.347163000 27.332828s info: Table 01b1dc89-45f1-4629-80a8-d0e7843c4466: This server is Raft leader for term 1. Latest log index is 0.

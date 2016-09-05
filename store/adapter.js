@@ -11,6 +11,7 @@ class Adapter {
 
     start(store) {
         this.store = store;
+        this.store.cache.key = this.key;
         this.watch();
         this.connect();
     }
@@ -28,7 +29,6 @@ class Adapter {
 
         this.globalSocket.on('connection', socket => {
             console.log('new connection to ' + this.name);
-            // socket.join(socket.id);
             this.socket = socket;
             this.initEndPoints();
             this.send();
@@ -88,8 +88,8 @@ class Adapter {
             data: data,
         };
 
-        this.store.cache.lpush(this.key, JSON.stringify(version));
-        this.store.cache.ltrim(this.key, [0, this.historyLimit]);
+        this.store.cache.add(JSON.stringify(version));
+        this.store.cache.cut();
 
         if (emitHash) {
             this.hash(data, true);
@@ -97,22 +97,20 @@ class Adapter {
     }
 
     inHistory(hash) {
-        return new Promise((resolve, reject) => {
-            this.store.cache.lrange(this.key, [0, this.historyLimit], (err, data) => {
-                if (err) return reject(err);
+        return this.store.cache.retrieve().then(data => {
+            let ret = false;
+            var len = data.length;
 
-                var len = data.length;
+            for (var i = 0; i < len; i++) {
+                var version = JSON.parse(data[i]);
 
-                for (var i = 0; i < len; i++) {
-                    var version = JSON.parse(data[i]);
-
-                    if (version.id === hash) {
-                        return resolve(version.data);
-                    }
+                if (version.id === hash) {
+                    ret = version.data;
+                    break;
                 }
+            }
 
-                return resolve(false);
-            });
+            return ret;
         });
     }
 
@@ -121,7 +119,10 @@ class Adapter {
         let key = oldHash + this.newHash;
 
         this.deltaInHistory(key).then(data => {
-            if (!data) {
+            if (data) {
+                console.log('CACHED COPY OF DELTA');
+                cb(data);
+            } else {
                 this.data().then(data => {
                     let diff = differ.create({
                         textDiff: {
@@ -136,24 +137,19 @@ class Adapter {
                         data: delta,
                     };
 
-                    this.store.cache.lpush(this.key + '_deltas', JSON.stringify(deltaVersion));
+                    this.store.cache.add(JSON.stringify(deltaVersion), this.key + '_deltas');
 
                     cb(delta);
                 }).catch(err => {
                     throw err;
                 });
-            } else {
-                console.log('CACHED COPY OF DELTA');
-                cb(data);
             }
         });
     }
 
     deltaInHistory(key) {
         return new Promise((resolve, reject) => {
-            this.store.cache.lrange(this.key + '_deltas', [0, this.historyLimit], (err, data) => {
-                if (err) throw err;
-
+            this.store.cache.retrieve(this.key + '_deltas').then(data => {
                 data.forEach(el => {
                     el = JSON.parse(el);
 
@@ -163,6 +159,8 @@ class Adapter {
                 });
 
                 return resolve(false);
+            }).catch(err => {
+                throw err;
             });
         });
     }
@@ -170,7 +168,13 @@ class Adapter {
     full(cb) {
         console.time('cached');
         this.getCurrent().then(data => {
-            if (!data) {
+            console.log(data);
+
+            if (data) {
+                console.log('working with a cached copy');
+                console.timeEnd('cached');
+                cb(data);
+            } else {
                 console.log('working with a brand new copy from the source');
 
                 console.time('new');
@@ -182,25 +186,21 @@ class Adapter {
                 }).catch(err => {
                     throw err;
                 });
-            } else {
-                console.log('working with a cached copy');
-                console.timeEnd('cached');
-                cb(data);
             }
         });
     }
 
     getCurrent() {
-        return new Promise((resolve, reject) => {
-            this.store.cache.lrange(this.key, [0, 0], (err, data) => {
-                if (err) throw err;
+        return this.store.cache.retrieve({limit: 1}).then(data => {
+            let ret = false;
 
-                if (data.length === false) {
-                    return resolve(false);
-                }
+            if (data) {
+                ret = JSON.parse(data).data;
+            }
 
-                return resolve(JSON.parse(data[0]).data);
-            });
+            console.log(ret);
+
+            return ret;
         });
     }
 
