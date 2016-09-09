@@ -97,9 +97,11 @@ class Adapter {
     }
 
     inHistory(hash) {
-        return this.store.cache.retrieve().then(data => {
+        return this.store.cache.retrieve().then(data => { // Continue...
+            console.log(data);
+
             let ret = false;
-            var len = data.length;
+            var len = data.length; // ERROR: Cannot read property 'length' of undefined
 
             for (var i = 0; i < len; i++) {
                 var version = JSON.parse(data[i]);
@@ -154,13 +156,11 @@ class Adapter {
                     el = JSON.parse(el);
 
                     if (el.id === key) {
-                        return resolve(el.data);
+                        resolve(el.data);
                     }
                 });
 
-                return resolve(false);
-            }).catch(err => {
-                throw err;
+                resolve(false);
             });
         });
     }
@@ -168,7 +168,7 @@ class Adapter {
     full(cb) {
         console.time('cached');
         this.getCurrent().then(data => {
-            console.log(data);
+            console.log('IN FULL', data);
 
             if (data) {
                 console.log('working with a cached copy');
@@ -197,8 +197,6 @@ class Adapter {
             if (data) {
                 ret = JSON.parse(data).data;
             }
-
-            console.log(ret);
 
             return ret;
         });

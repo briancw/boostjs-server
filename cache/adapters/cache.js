@@ -45,8 +45,10 @@ class Cache {
             let ret = data;
 
             if (ret && params.limit === 1) {
-                ret = ret[0];
+                ret = ret[ret.length - 1];
             }
+
+            console.log(ret);
 
             return ret;
         });

@@ -8,6 +8,7 @@ const boostAuth = require('./auth/auth');
 
 // Cache options
 const RedisCache = require('./cache/adapters/redis');
+const ArrayCache = require('./cache/adapters/array');
 
 app.use(helmet());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -20,7 +21,13 @@ class BoostServer {
         this.server = spdy.createServer(server_opts, app);
         this.app = app;
         this.io = this.io;
-        this.cache = server_opts.cache;
+        this.cacheOpts = server_opts.cache;
+
+        this.caches = {
+            redis: RedisCache,
+            array: ArrayCache,
+        };
+
         this.initCache();
 
         let io = require('socket.io').listen(this.server);
@@ -37,11 +44,9 @@ class BoostServer {
     }
 
     initCache() {
-        let cache = this.cache;
-
-        if (cache.type === 'redis') {
-            this.cache = new RedisCache(cache);
-        }
+        let cacheOpts = this.cacheOpts;
+        let cache = this.caches[cacheOpts.type];
+        this.cache = Reflect.construct(cache, [cacheOpts]);
     }
 
     launch(port) {
