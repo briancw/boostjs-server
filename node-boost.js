@@ -28,7 +28,7 @@ class BoostServer {
             array: ArrayCache,
         };
 
-        this.initCache();
+        this.cache = this.caches[this.cacheOpts.type];
 
         let io = require('socket.io').listen(this.server);
         io.set('transports', ['websocket']);
@@ -43,12 +43,6 @@ class BoostServer {
         };
     }
 
-    initCache() {
-        let cacheOpts = this.cacheOpts;
-        let cache = this.caches[cacheOpts.type];
-        this.cache = Reflect.construct(cache, [cacheOpts]);
-    }
-
     launch(port) {
         this.server.listen(port, err => {
             this.helpers.handle(err);
@@ -61,6 +55,8 @@ class BoostServer {
             name: path,
             model: model,
             query: query,
+            cache: this.cache,
+            cacheOpts: this.cacheOpts,
         }).start(this);
     }
 }

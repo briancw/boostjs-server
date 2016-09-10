@@ -2,7 +2,7 @@ const Cache = require('./cache');
 const Redis = require('redis');
 
 class RedisCache extends Cache {
-    cache() {
+    data() {
         return Redis.createClient();
     }
 

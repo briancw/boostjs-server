@@ -3,17 +3,25 @@ const differ = require('jsondiffpatch');
 
 class Adapter {
     constructor(config) {
+        this.config = config;
         this.name = config.name;
         this.key = config.key || this.name;
-        this.historyLimit = config.historyLimit || 10;
         this.query = config.query;
     }
 
     start(store) {
         this.store = store;
-        this.store.cache.key = this.key;
+        this.initCache();
         this.watch();
         this.connect();
+    }
+
+    initCache() {
+        let config = this.config;
+        let opts = config.cacheOpts;
+        opts.key = this.key;
+
+        this.cache = Reflect.construct(config.cache, [opts]);
     }
 
     send() {
@@ -88,8 +96,8 @@ class Adapter {
             data: data,
         };
 
-        this.store.cache.add(JSON.stringify(version));
-        this.store.cache.cut();
+        this.cache.add(JSON.stringify(version));
+        this.cache.cut();
 
         if (emitHash) {
             this.hash(data, true);
@@ -97,11 +105,11 @@ class Adapter {
     }
 
     inHistory(hash) {
-        return this.store.cache.retrieve().then(data => { // Continue...
+        return this.cache.retrieve().then(data => {
             console.log(data);
 
             let ret = false;
-            var len = data.length; // ERROR: Cannot read property 'length' of undefined
+            var len = data.length;
 
             for (var i = 0; i < len; i++) {
                 var version = JSON.parse(data[i]);
@@ -139,7 +147,7 @@ class Adapter {
                         data: delta,
                     };
 
-                    this.store.cache.add(JSON.stringify(deltaVersion), this.key + '_deltas');
+                    this.cache.add(JSON.stringify(deltaVersion), this.key + '_deltas');
 
                     cb(delta);
                 }).catch(err => {
@@ -151,7 +159,7 @@ class Adapter {
 
     deltaInHistory(key) {
         return new Promise((resolve, reject) => {
-            this.store.cache.retrieve(this.key + '_deltas').then(data => {
+            this.cache.retrieve(this.key + '_deltas').then(data => {
                 data.forEach(el => {
                     el = JSON.parse(el);
 
@@ -191,7 +199,7 @@ class Adapter {
     }
 
     getCurrent() {
-        return this.store.cache.retrieve({limit: 1}).then(data => {
+        return this.cache.retrieve({limit: 1}).then(data => {
             let ret = false;
 
             if (data) {

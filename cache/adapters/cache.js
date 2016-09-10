@@ -3,7 +3,34 @@ class Cache {
 
     constructor(config) {
         this.historyLimit = config.limit - 1 || 9;
-        this.cache = this.cache();
+        this.key = config.key;
+        this.cache = this.data();
+        this.registerHooks();
+    }
+
+    registerHooks() {
+        this.onInit();
+        this.onExit();
+    }
+
+    onInit() {
+        if (this.onBeforeStart) {
+            this.onBeforeStart();
+        }
+    }
+
+    onExit() {
+        if (this.onBeforeEnd) {
+            process.stdin.resume();
+
+            process.on('SIGINT', () => {
+                this.onBeforeEnd();
+            });
+        }
+    }
+
+    end() {
+        process.exit();
     }
 
     add(val, key) {
@@ -45,7 +72,7 @@ class Cache {
             let ret = data;
 
             if (ret && params.limit === 1) {
-                ret = ret[ret.length - 1];
+                ret = ret[0];
             }
 
             console.log(ret);
