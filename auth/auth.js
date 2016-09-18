@@ -6,6 +6,7 @@ module.exports = {
         auth: function(req, res, next) {
             if (req.body.token) {
                 let token = req.body.token;
+                console.log('UPLOADED_TOKEN:', token);
 
                 jwt.verify(token, secret_key, function(err, decoded) {
                     console.log('######');

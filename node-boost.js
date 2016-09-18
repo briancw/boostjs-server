@@ -24,8 +24,8 @@ class BoostServer {
     constructor(serverOpts) {
         this.server = spdy.createServer(serverOpts, app);
         this.app = app;
-        this.io = this.io;
         this.serverOpts = serverOpts;
+        this.cacheOpts = serverOpts.cache;
 
 
         this.caches = {
@@ -33,11 +33,18 @@ class BoostServer {
             array: ArrayCache,
         };
 
-        this.cache = this.caches[this.serverOpts.cache.type];
+        this.cache = this.caches[this.cacheOpts.type];
 
         let io = require('socket.io').listen(this.server);
         io.set('transports', ['websocket']);
         this.io = io;
+        this.globalSocket = this.io.of('/application');
+
+        this.globalSocket.on('connection', socket => {
+            console.log('app:client-connected');
+            this.socket = socket;
+            this.registerListeners();
+        })
 
         this.helpers = {
             handle: function(err) {
@@ -90,8 +97,21 @@ class BoostServer {
         }
         let fileName = token.substr(token.lastIndexOf('.') + 1, 8);
         console.log('wrote session');
-        fs.writeFileSync('./.sessions/' + fileName + '.s', '', 'utf8');
+        fs.writeFileSync('.sessions/' + fileName + '.s', '', 'utf8');
+
         return true;
+    }
+
+    registerListeners() {
+        console.log('app:ready');
+        this.socket.emit('app:ready');
+
+
+        this.socket.on('auth.logout', (token, cb) => {
+            console.log('auth:logged-out', token);
+            this.logoutToken(token);
+            cb('Logged out');
+        });
     }
 
     // Thought I'd start on the tasking stuff. Dunno if this works but it's not used anywhere yet.
