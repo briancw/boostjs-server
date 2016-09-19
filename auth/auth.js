@@ -4,10 +4,11 @@ const secret_key = process.env.JWT_SECRET;
 
 module.exports = {
         auth: function(req, res, next) {
+
             console.log('auth');
-            // console.log(req.headers.token);
             if (req.headers.token) {
                 let token = req.headers.token;
+                console.log('UPLOADED_TOKEN:', token);
 
                 jwt.verify(token, secret_key, function(err, decoded) {
                     // If something went wrong
