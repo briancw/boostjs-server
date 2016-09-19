@@ -61,7 +61,7 @@ class BoostServer {
             model: model,
             query: query,
             cache: this.cache,
-            cacheOpts: this.cacheOpts,
+            cacheOpts: this.serverOpts.cache,
         }).start(this);
     }
 

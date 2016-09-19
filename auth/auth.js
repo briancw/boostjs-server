@@ -4,16 +4,12 @@ const secret_key = process.env.JWT_SECRET;
 
 module.exports = {
         auth: function(req, res, next) {
-            if (req.body.token) {
-                let token = req.body.token;
+            console.log('auth');
+            // console.log(req.headers.token);
+            if (req.headers.token) {
+                let token = req.headers.token;
 
                 jwt.verify(token, secret_key, function(err, decoded) {
-                    console.log('######');
-                    console.log(Date.now());
-                    console.log(decoded.invalidationDate);
-                    console.log(Date.now() >= decoded.invalidationDate);
-                    console.log('######');
-
                     // If something went wrong
                     if (err) {
                         console.log('Error in server auth');
@@ -40,7 +36,7 @@ module.exports = {
                 });
             } else {
                 console.log('No token supplied to server auth');
-                console.log(req.body);
+                // console.log(req.headers);
                 next();
             }
         },
