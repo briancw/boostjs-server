@@ -3,12 +3,15 @@ const bodyParser = require('body-parser');
 const app = express();
 const helmet = require('helmet');
 const spdy = require('spdy');
-const BoostRethink = require('./store/adapters/boost-rethink');
 const boostAuth = require('./auth/auth');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
 const secret_key = process.env.JWT_SECRET;
+
+// Adapter options
+const BoostRethink = require('./store/adapters/boost-rethink');
+const File = require('./store/adapters/file');
 
 // Cache options
 const RedisCache = require('./cache/adapters/redis');
@@ -27,12 +30,17 @@ class BoostServer {
         this.serverOpts = serverOpts;
         this.cacheOpts = serverOpts.cache;
 
+         this.adapters = {
+            rethink: BoostRethink,
+            file: File,
+         };
 
         this.caches = {
             redis: RedisCache,
             array: ArrayCache,
         };
 
+        this.adapter = this.adapters[this.serverOpts.adapter];
         this.cache = this.caches[this.cacheOpts.type];
 
         let io = require('socket.io').listen(this.server);
@@ -44,7 +52,7 @@ class BoostServer {
             console.log('app:client-connected');
             this.socket = socket;
             this.registerListeners();
-        })
+        });
 
         this.helpers = {
             handle: function(err) {
@@ -63,13 +71,16 @@ class BoostServer {
     }
 
     publish(path, model, query = {}) {
-        return new BoostRethink({
+        let adapter = Reflect.construct(this.adapter, [{
             name: path,
+            path: model,
             model: model,
             query: query,
             cache: this.cache,
-            cacheOpts: this.serverOpts.cache,
-        }).start(this);
+            cacheOpts: this.cacheOpts,
+        }]);
+        
+        adapter.start(this);
     }
 
     getLoginToken(user, authStatus) {
